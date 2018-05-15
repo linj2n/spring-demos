@@ -49,4 +49,9 @@ public class User implements Serializable {
     public void setLastIp(String lastIp) {
         this.lastIp = lastIp;
     }
+
+    @Override
+    public String toString() {
+        return new String("[ " + " userName= "+userName + ", userId= " + userId +", userPwd= " + this.getPassword() + ", LastVisit= " + lastVisit + ", LastIp= " + lastIp + " ]");
+    }
 }
