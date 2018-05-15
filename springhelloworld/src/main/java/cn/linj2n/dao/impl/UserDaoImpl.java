@@ -48,7 +48,7 @@ public class UserDaoImpl implements UserDaoApi {
         Object[] args = new Object[]{user.getLastVisit(),
                 user.getLastIp(),user.getUserId()};
         int rs = jdbcTemplate.update(UPDATE_LOGIN_INFO_SQL, args );
-        System.out.println("updateLoginInfo: rs= "+ rs);
+
     }
 
     @Autowired // 2. 自动注入 JdbcTemplate Bean

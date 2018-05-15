@@ -8,7 +8,6 @@ import java.util.Date;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import static org.testng.Assert.*;
 
 @ContextConfiguration("classpath*:/context.xml")
@@ -27,7 +26,6 @@ public class UserServiceImplTest extends AbstractTransactionalTestNGSpringContex
     @Test
     public void testFindUserByUserName() throws Exception {
         User user = userService.findUserByUserName("admin");
-        System.out.println(user.toString());
         assertEquals(user.getUserName(),"admin");
     }
 

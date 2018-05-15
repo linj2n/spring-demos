@@ -36,7 +36,5 @@ public class LoginInfoDaoImpl implements LoginInfoDaoApi {
         ApplicationContext context = new ClassPathXmlApplicationContext("context.xml");
 
         BasicDataSource dataSource = context.getBean("dataSource",BasicDataSource.class);
-        System.out.println(dataSource.getUsername());
-        System.out.println(dataSource.getPassword());
     }
 }
