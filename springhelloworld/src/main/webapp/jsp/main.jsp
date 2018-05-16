@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>小春论坛</title>
+<title>欢迎！</title>
 </head>
 <body>
     ${user.userName},欢迎您!;
