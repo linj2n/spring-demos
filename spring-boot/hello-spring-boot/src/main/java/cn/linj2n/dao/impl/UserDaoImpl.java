@@ -60,23 +60,4 @@ public class UserDaoImpl implements UserDaoApi {
         return jdbcTemplate;
     }
 
-    public static void main (String[] args) {
-        String UPDATE_LOGIN_INFO_SQL = " UPDATE t_user SET " +
-                " last_visit=?,last_ip=? WHERE user_id=? ";
-        UserDaoImpl userDao = new UserDaoImpl();
-        User user = new User();
-
-        user.setUserId(1);
-        user.setUserName("admin");
-        user.setLastIp("192.168.12.7");
-        user.setLastVisit(new Date());
-
-        Object[] args1 = new Object[]{user.getLastVisit(),
-                user.getLastIp(),user.getUserId()};
-
-        JdbcTemplate jdbcTemplate = userDao.getJdbcTemplate();
-
-        int update = jdbcTemplate.update(UPDATE_LOGIN_INFO_SQL, args1);
-
-    }
 }
