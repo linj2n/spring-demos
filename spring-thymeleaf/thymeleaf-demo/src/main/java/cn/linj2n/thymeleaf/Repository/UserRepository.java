@@ -34,6 +34,4 @@ public interface UserRepository {
      * @return
      */
     List<User> listUsers();
-
-
 }
