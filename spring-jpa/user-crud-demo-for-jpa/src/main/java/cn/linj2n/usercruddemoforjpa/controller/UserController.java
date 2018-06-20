@@ -5,6 +5,7 @@ import cn.linj2n.usercruddemoforjpa.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -13,17 +14,15 @@ public class UserController {
 
     private static final String RESULT_SUCCESS = "success";
     private static final String RESULT_FAILED = "failed";
+
     @Autowired
     private UserRepository userRepository;
 
-    @RequestMapping("/save")
+    @GetMapping("/save")
     public String save(@RequestParam("name") String name,
                        @RequestParam("age") Integer age,
                        @RequestParam("gender") String gender) {
-        User user = new User(null,null,null,null);
-        user.setAge(age);
-        user.setGender(gender);
-        user.setName(name);
+        User user = new User(null,name,age,gender);
         try {
             userRepository.save(user);
             return RESULT_SUCCESS;
@@ -33,8 +32,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/delete{id}")
-    public String delete(@PathVariable("id") Long id) {
+    @GetMapping("/delete")
+    public String delete(@RequestParam("id") Long id) {
         try {
             userRepository.delete(id);
             return RESULT_SUCCESS;
@@ -49,8 +48,8 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/find{id}")
-    public User find(@PathVariable("id") Long id) {
+    @GetMapping("/find")
+    public User find(@RequestParam("id") Long id) {
         return userRepository.findOne(id);
     }
 
