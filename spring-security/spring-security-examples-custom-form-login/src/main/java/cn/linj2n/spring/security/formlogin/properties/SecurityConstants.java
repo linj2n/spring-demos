@@ -4,6 +4,6 @@ public interface SecurityConstants {
     /**
      * 默认的用户注册请求处理url
      */
-    String DEFAULT_REGISTER_URL = "/authentication/register";
+    String DEFAULT_REGISTER_URL = "/register";
 
 }
