@@ -9,7 +9,7 @@ public class MainController {
 
     @RequestMapping("/")
     public String root() {
-        System.out.println("hit");
+        System.out.print("hit the point.");
         return "redirect:/index";
     }
 
@@ -20,6 +20,7 @@ public class MainController {
 
     @RequestMapping("/user/index")
     public String userIndex() {
+        System.out.print("hit the point.");
         return "user/index";
     }
 
