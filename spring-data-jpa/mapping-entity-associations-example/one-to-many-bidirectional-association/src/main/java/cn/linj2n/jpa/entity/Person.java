@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 public class Person implements Serializable {
@@ -17,7 +16,7 @@ public class Person implements Serializable {
 
     private Integer age;
 
-    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL,fetch = FetchType.EAGER,orphanRemoval = true)
+    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Address> addresses = new ArrayList<>();
 
     protected Person() { // JPA 的规范要求无参构造函数；设为 protected 防止直接使用
@@ -60,20 +59,13 @@ public class Person implements Serializable {
         this.addresses = addresses;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person)) return false;
-        Person person = (Person) o;
-        return Objects.equals(id, person.id) &&
-                Objects.equals(name, person.name) &&
-                Objects.equals(age, person.age) &&
-                Objects.equals(addresses, person.addresses);
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setPerson(this);
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, name, age, addresses);
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setPerson(null);
     }
 }

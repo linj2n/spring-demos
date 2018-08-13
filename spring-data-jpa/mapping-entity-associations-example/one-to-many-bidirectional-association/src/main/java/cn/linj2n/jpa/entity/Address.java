@@ -4,7 +4,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "Address")
+@Table(name = "address")
 public class Address implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +23,13 @@ public class Address implements Serializable{
     private Person person;
 
     protected Address(){
+    }
+
+    public Address(String street, String city, String province, String country,Person person) {
+        this.street = street;
+        this.city = city;
+        this.province = province;
+        this.country = country;
     }
 
     public Address(String street, String city, String province, String country) {
@@ -70,6 +78,14 @@ public class Address implements Serializable{
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     @Override

@@ -17,6 +17,7 @@ public class Person implements Serializable {
     private Integer age;
 
     @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER,orphanRemoval = true)
+    @JoinColumn(name = "person_id")
     private List<Address> addresses = new ArrayList<>();
 
     protected Person() { // JPA 的规范要求无参构造函数；设为 protected 防止直接使用
