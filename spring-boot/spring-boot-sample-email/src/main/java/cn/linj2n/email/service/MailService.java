@@ -1,17 +1,21 @@
 package cn.linj2n.email.service;
+import cn.linj2n.email.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import org.apache.commons.lang.CharEncoding;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.mail.internet.MimeMessage;
+import java.util.Locale;
+
 @Service
 //@PropertySource("classpath:email.yml")
 public class MailService {
@@ -20,6 +24,12 @@ public class MailService {
 
     @Value("${spring.mail.username}")
     private String FROM_ADRRESS ;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private JavaMailSenderImpl javaMailSender;
@@ -42,4 +52,14 @@ public class MailService {
         }
     }
 
+    public void sendActivationEmail(User user, String baseUrl) {
+        logger.debug("Sending activation e-mail to '{}'", user.getEmail());
+        Locale locale = new Locale("zh","CN");
+        Context context = new Context(locale);
+        context.setVariable("user", user);
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("mails/activationEmail", context);
+        String subject = messageSource.getMessage("email.activation.title", null, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
 }
