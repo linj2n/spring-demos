@@ -18,3 +18,5 @@ spring:
         smtp:
           ssl:
             enable: true
+  messages:
+    basename: i18n/messages
