@@ -33,4 +33,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile("com.fasterxml.jackson.core:jackson-core")
+	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile("com.fasterxml.jackson.core:jackson-annotations")
+
+
 }
