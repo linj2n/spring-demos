@@ -33,8 +33,6 @@ public class User {
         this.email = email;
     }
 
-
-
     public String getActivationKey() {
         return activationKey;
     }
