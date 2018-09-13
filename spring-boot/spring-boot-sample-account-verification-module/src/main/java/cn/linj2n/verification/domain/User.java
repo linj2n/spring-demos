@@ -3,6 +3,7 @@ package cn.linj2n.verification.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import javax.persistence.*;
@@ -55,7 +56,7 @@ public class User implements  Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-            name = "ib_user_authority",
+            name = "vm_user_authority",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_id", referencedColumnName = "id")})
     private Set<Authority> authorities = new HashSet<>();
