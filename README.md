@@ -1,2 +1,2 @@
 # spring-demos
-📒学习Spring过程中的一些demo代码
+📒Some code snippets, demos for Spring framework integration.
