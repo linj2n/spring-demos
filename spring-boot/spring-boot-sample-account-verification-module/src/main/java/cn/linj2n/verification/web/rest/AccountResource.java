@@ -33,7 +33,7 @@ public class AccountResource {
     private EmailService emailService;
 
 
-    @RequestMapping(value = "/register",
+    @RequestMapping(value = "account/register",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
@@ -41,18 +41,18 @@ public class AccountResource {
 
         // 1. check that the account doesn’t already Exist
         if (userService.checkIfExitUserByLoginOrEmail(userDTO.getLogin(), userDTO.getEmail())) {
-            Locale locale = new Locale("zh","CN");
-            return new ResponseEntity<>(messageSource.getMessage("message.emailOrLogin.alreadyExist",null,locale), HttpStatus.BAD_REQUEST);
+            Locale locale = new Locale("zh", "CN");
+            return new ResponseEntity<>(messageSource.getMessage("message.emailOrLogin.alreadyExist", null, locale), HttpStatus.BAD_REQUEST);
         }
         // 2. create new user with userDto information
         User user = userService.createUserInformation(userDTO.getLogin(), userDTO.getPassword(), userDTO.getLogin(), userDTO.getEmail());
 
         // 3. send activation email
-        emailService.sendActivationEmail(user,"http://localhost:8080");
+        emailService.sendActivationEmail(user, "http://localhost:8080");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/activate",
+    @RequestMapping(value = "account/activate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
@@ -69,5 +69,15 @@ public class AccountResource {
         return null;
     }
 
+    @RequestMapping(value = "/account/existence",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> checkIfExistUser(@RequestParam(value = "login", required = false, defaultValue = "") final String login,
+                                              @RequestParam(value = "email", required = false, defaultValue = "") final String email) {
 
+        // TODO:
+        Boolean exited = userService.checkIfExitUserByLoginOrEmail(login, email);
+        logger.info("Get url(/account/existence) result : --------> " + exited);
+        return exited ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }
