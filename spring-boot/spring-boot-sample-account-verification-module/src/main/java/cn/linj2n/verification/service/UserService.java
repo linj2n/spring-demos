@@ -31,7 +31,9 @@ public class UserService {
     private AuthorityRepository authorityRepository;
 
     public User createUserInformation(String login, String password, String username, String email) {
-        User newUser = new User();
+        User newUser = userRepository.findOneByLoginOrEmail(login,email).orElse(new User());
+
+        logger.info("User -----> " + newUser.toString());
 
         // 1. preparing for security
         Set<Authority> authorities = new HashSet<>();
@@ -64,8 +66,9 @@ public class UserService {
         // TODO: changePassword
     }
 
-    public Boolean checkIfExitUserByLoginOrEmail(String login,String email) {
-        return userRepository.findOneByLoginOrEmail(login.toLowerCase(), email.toLowerCase()).isPresent();
+    public Boolean checkIfExitUserActivatedByLoginOrEmail(String login,String email) {
+        User user = userRepository.findOneByLoginOrEmail(login.toLowerCase(), email.toLowerCase()).orElse(null);
+        return user != null && user.isActivated();
     }
 
 }
