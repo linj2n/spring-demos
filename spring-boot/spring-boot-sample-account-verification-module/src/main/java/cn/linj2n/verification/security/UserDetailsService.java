@@ -5,13 +5,16 @@ import cn.linj2n.verification.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,16 +26,22 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+    @Transactional
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException, UserNotActivatedException{
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
         Optional<User> userFromDatabase = userRepository.findOneByLoginOrEmail(lowercaseLogin, lowercaseLogin);
+        // Default locale value
+        Locale locale = new Locale("zh","CN");
         return userFromDatabase.map(user -> {
 
             // 1. 处理 user 没有激活情况
             if (!user.isActivated()) {
-                throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+                throw new UserNotActivatedException("account.user.notActivated");
             }
 
             // 2. 获取 user 拥有的权限
@@ -44,8 +53,7 @@ public class UserDetailsService implements org.springframework.security.core.use
             return new org.springframework.security.core.userdetails.User(lowercaseLogin,
                     user.getPassword(),
                     grantedAuthorities);
-        }).orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the " +
-                "database"));
+        }).orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("account.user.notExisted",null,locale)));
 
     }
 }
