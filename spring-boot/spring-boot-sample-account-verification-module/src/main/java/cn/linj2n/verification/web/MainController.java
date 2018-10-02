@@ -6,13 +6,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class MainController {
-    @RequestMapping(value = {"/","/index"},method = RequestMethod.GET)
+    @RequestMapping(value = {"/admin/index"},method = RequestMethod.GET)
     public String getIndex(){
-        return "index";
+        return "admin/index";
     }
 
+    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    public String login() {
+        return "login";
+    }
     @RequestMapping(value = "/register",method = RequestMethod.GET)
     public String getRegister () {
         return "register";
+    }
+    @RequestMapping(value = "/blank",method = RequestMethod.GET)
+    public String getBlank () {
+        return "blank";
     }
 }
