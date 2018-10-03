@@ -154,16 +154,21 @@
         errorClass: "ui pointing red basic label",
         submitHandler: function (form) {
             console.log("call form post ajax");
-            $.ajax({
-                url: form.action,
-                type: form.method,
-                data: $(form).serialize(),
-                success: function(response) {
-                    console.log("sumit to server ------> success");
-                    /*TODO: 弹出模态框,再转到默认页面*/
-                    window.location.href = "/admin/index";
-                }
-            });
+            var formData = $(form).serialize();
+            $.post(form.action, formData, function (data) {
+
+            })
+            ;
+            // $.ajax({
+            //     url: form.action,
+            //     type: form.method,
+            //     data: $(form).serialize(),
+            //     success: function(response) {
+            //         console.log("sumit to server ------> success");
+            //         /*TODO: 弹出模态框,再转到默认页面*/
+            //         window.location.href = "/admin/index";
+            //     }
+            // });
         }
     })
     ;
