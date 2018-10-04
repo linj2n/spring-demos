@@ -51,6 +51,14 @@
                 </p></div>
             </div>
         </form>
+        <div class="ui mini modal">
+            <div class="header">提示</div>
+            <div class="content">
+            </div>
+            <div class="actions">
+                <div class="ui approve green button">确定</div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="ui vertical footer ">
@@ -156,7 +164,28 @@
             console.log("call form post ajax");
             var formData = $(form).serialize();
             $.post(form.action, formData, function (data) {
-
+                $('.ui.mini.modal')
+                    .modal({
+                        closable  : true,
+                        onApprove : function () {
+                            window.location.href = "/admin/index";
+                        },
+                        onShow: function () {
+                            $(this).find('.content').html(/*[[#{activationEmail.sentSuccessfully}]]*/);
+                        }
+                    })
+                    .modal('show')
+                ;
+            }).fail(function (data) {
+                $('.ui.mini.modal')
+                    .modal({
+                        closable  : true,
+                        onShow: function () {
+                            $(this).find('.content').html(/*[[#{activationEmail.failedToSend}]]*/);
+                        }
+                    })
+                    .modal('show')
+                ;
             })
             ;
             // $.ajax({
