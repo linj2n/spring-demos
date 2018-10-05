@@ -49,7 +49,7 @@ public class AccountResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
-        // TODO: activateAccount
+        userService.activateRegistration(key);
         return null;
     }
 
