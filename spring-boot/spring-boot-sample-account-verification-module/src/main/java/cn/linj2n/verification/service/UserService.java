@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.Role;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class UserService {
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -62,8 +64,7 @@ public class UserService {
     }
 
     public Optional<User> activateRegistration(String key) {
-        // TODO: activateRegistration
-        return Optional.empty();
+        return userRepository.findOneByActivationKey(key);
     }
 
     public void changePassword(String password) {
