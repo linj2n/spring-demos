@@ -52,7 +52,7 @@
             </div>
         </form>
         <div class="ui mini modal">
-            <div class="header">提示</div>
+            <div class="header">错误</div>
             <div class="content">
             </div>
             <div class="actions">
@@ -177,27 +177,22 @@
                     .modal('show')
                 ;
             }).fail(function (data) {
+                var result = data.responseJSON;
+                var msg = /*[[#{message.default.errorMsg}]]*/;
+                if (result.error == "UserAlreadyExist") {
+                    msg = result.message;
+                }
                 $('.ui.mini.modal')
                     .modal({
                         closable  : true,
                         onShow: function () {
-                            $(this).find('.content').html(/*[[#{activationEmail.failedToSend}]]*/);
+                            $(this).find('.content').html(msg);
                         }
                     })
                     .modal('show')
                 ;
             })
             ;
-            // $.ajax({
-            //     url: form.action,
-            //     type: form.method,
-            //     data: $(form).serialize(),
-            //     success: function(response) {
-            //         console.log("sumit to server ------> success");
-            //         /*TODO: 弹出模态框,再转到默认页面*/
-            //         window.location.href = "/admin/index";
-            //     }
-            // });
         }
     })
     ;
