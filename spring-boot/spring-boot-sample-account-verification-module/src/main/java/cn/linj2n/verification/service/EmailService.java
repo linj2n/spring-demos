@@ -1,6 +1,7 @@
 package cn.linj2n.verification.service;
 
 import cn.linj2n.verification.domain.User;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import org.apache.commons.lang.CharEncoding;
@@ -37,6 +38,7 @@ public class EmailService {
     private JavaMailSenderImpl javaMailSender;
 
 
+    @Async
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         logger.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
                 isMultipart, isHtml, to, subject, content);
@@ -55,7 +57,7 @@ public class EmailService {
         }
     }
 
-    // TODO: add aysnc support
+    @Async
     public void sendActivationEmail(User user, String baseUrl) {
         logger.debug("Sending activation e-mail to '{}'", user.getEmail());
         Locale locale = new Locale("zh","CN");
