@@ -15,7 +15,9 @@ import org.springframework.context.MessageSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -36,18 +38,9 @@ public class AccountResource {
     @RequestMapping(value = "account/register",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<?> registerAccount(@Valid UserDTO userDTO, HttpServletRequest request) {
         logger.info("Register a new Account: -----> UserDto {}", userDTO.toString());
-
-        // 1. check that the account doesn’t already Exist
-        if (userService.checkIfExitUserByLoginOrEmail(userDTO.getLogin(), userDTO.getEmail())) {
-            Locale locale = new Locale("zh", "CN");
-            return new ResponseEntity<>(messageSource.getMessage("message.emailOrLogin.alreadyExist", null, locale), HttpStatus.BAD_REQUEST);
-        }
-        // 2. create new user with userDto information
         User user = userService.createUserInformation(userDTO.getLogin(), userDTO.getPassword(), userDTO.getLogin(), userDTO.getEmail());
-
-        // 3. send activation email
         emailService.sendActivationEmail(user, "http://localhost:8080");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -72,12 +65,11 @@ public class AccountResource {
     @RequestMapping(value = "/account/existence",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> checkIfExistUser(@RequestParam(value = "login", required = false, defaultValue = "") final String login,
+    public Map checkIfExistUser(@RequestParam(value = "login", required = false, defaultValue = "") final String login,
                                               @RequestParam(value = "email", required = false, defaultValue = "") final String email) {
-
-        // TODO:
-        Boolean exited = userService.checkIfExitUserByLoginOrEmail(login, email);
-        logger.info("Get url(/account/existence) result : --------> " + exited);
-        return exited ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Map<String,Boolean> result = new HashMap<>();
+        result.put("existed",userService.checkIfExitUserActivatedByLoginOrEmail(login, email));
+        logger.info("Get url(/account/existence) result : --------> " + result.get("existed"));
+        return result;
     }
 }

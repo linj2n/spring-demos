@@ -5,6 +5,7 @@ import cn.linj2n.verification.domain.User;
 import cn.linj2n.verification.repository.AuthorityRepository;
 import cn.linj2n.verification.repository.UserRepository;
 import cn.linj2n.verification.service.utils.RandomUtil;
+import cn.linj2n.verification.web.errors.UserAlreadyExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,12 @@ public class UserService {
     private AuthorityRepository authorityRepository;
 
     public User createUserInformation(String login, String password, String username, String email) {
-        User newUser = userRepository.findOneByLoginOrEmail(login,email).orElse(new User());
 
-        logger.info("User -----> " + newUser.toString());
+        if (checkIfExitUserActivatedByLoginOrEmail(login,email)) {
+            throw new UserAlreadyExistException("User has already existed. [login=" + login + ",email=" + email + "]");
+        }
+
+        User newUser = new User();
 
         // 1. preparing for security
         Set<Authority> authorities = new HashSet<>();
