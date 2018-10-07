@@ -46,16 +46,30 @@
                     <div id="message">
                     </div>
                 </div>
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
                 <div class="field">
                     <button class="ui fluid primary button" type="submit">确定</button>
                 </div>
-                <div class="field"><p><label>还没有账号? <a href="/register"> 注册 </a></label>
-                </p></div>
-
+                <div class="inline field">
+                    <a href="/register" th:href="@{/register}">注册</a>
+                    <a href="#">忘记密码?</a>
+                </div>
             </div>
         </form>
+        <div class="ui mini modal">
+            <div class="header">提示</div>
+            <div class="content">
+            </div>
+            <div class="actions">
+                <div class="ui approve blue button">确定</div>
+            </div>
+        </div>
     </div>
+
 </div>
+
 <div class="ui vertical footer ">
     <div class="ui center aligned container ">
       <span>
@@ -74,7 +88,12 @@
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    $('.negative.message .close')
+    var
+        authenticationUrl = [[@{/api/account/authentication}]],
+        loginPage = [[@{/login}]],
+        registerSuccessfullyUrl = [[@{/admin/index}]];
+
+    $('.positive.message .close')
         .on('click', function () {
             $(this)
                 .closest('.message')
@@ -117,31 +136,27 @@
         submitHandler: function (form) {
             console.log("call form post ajax");
             var formData = $(form).serialize();
-            $.post(form.action, formData, function (data) {
+            $.post(authenticationUrl, formData, function (data) {
                 console.log("submit to server ------> success");
-                window.location.href = "/admin/index";
+                window.location.href = registerSuccessfullyUrl;
             }).fail(function (data) {
                 var errors = data.responseJSON.message;
-
-                // var errors = $.parseJSON(data);
-                console.log(errors);
-                $('#message').text(errors);
-                $('.negative.message').transition('scale');
+                $('.ui.mini.modal')
+                    .modal({
+                        closable  : true,
+                        onApprove : function () {
+                            window.location.reload();
+                        },
+                        onShow: function () {
+                            $(this).find('.content').text(errors);
+                        }
+                    })
+                    .modal('show')
+                ;
             });
-
-            // $.ajax({
-            //     url: form.action,
-            //     type: form.method,
-            //     data: $(form).serialize(),
-            //     success: function(response) {
-            //         console.log("sumit to server ------> success");
-            //         window.location.href = "/admin/index";
-            //     }
-            // });
         }
     })
     ;
-
     /*]]>*/
 </script>
 </body>

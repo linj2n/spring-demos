@@ -28,7 +28,7 @@
 <body>
 <div class="ui middle aligned center aligned grid">
     <div class="left aligned column">
-        <form th:action="@{/api/account/register}" class="ui large form" id="registerForm" method="post">
+        <form  class="ui large form" id="registerForm" method="post">
             <div class="ui raised segment">
                 <h2 class="ui dividing header aligned left">注册</h2>
                 <div class="field">
@@ -44,6 +44,9 @@
                     <input type="password" id="matchPassword" name="matchPassword"
                            placeholder="再次输入密码">
                 </div>
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
                 <div class="field">
                     <button class="ui fluid primary button" type="submit">确定</button>
                 </div>
@@ -52,11 +55,11 @@
             </div>
         </form>
         <div class="ui mini modal">
-            <div class="header">错误</div>
+            <div class="header">提示</div>
             <div class="content">
             </div>
             <div class="actions">
-                <div class="ui approve green button">确定</div>
+                <div class="ui approve blue button">确定</div>
             </div>
         </div>
     </div>
@@ -77,13 +80,18 @@
 </script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    $('#registerForm').validate({
+    var
+        registerUrl = [[@{/api/account/register}]],
+        checkUserExistenceUrl = [[@{/api/account/existence}]],
+        registerSuccessfullyUrl = [[@{/admin/index}]];
+
+        $('#registerForm').validate({
         rules: {
             login: {
                 required: true,
                 minlength: 5,
                 remote: {
-                    url: '/api/account/existence',
+                    url: checkUserExistenceUrl,
                     type: 'get',
                     dataType: "json",
                     data: {
@@ -103,7 +111,7 @@
                 required: true,
                 email: true,
                 remote: {
-                    url: '/api/account/existence',
+                    url: checkUserExistenceUrl,
                     type: 'get',
                     dataType: "json",
                     data: {
@@ -151,7 +159,6 @@
             }
         },
         highlight: function (element, errorClass) {
-            // $(element).removeClass(errorClass);
             $(element).parent().addClass("error");
         },
         unhighlight: function (element, errorClass) {
@@ -163,12 +170,12 @@
         submitHandler: function (form) {
             console.log("call form post ajax");
             var formData = $(form).serialize();
-            $.post(form.action, formData, function (data) {
+            $.post(registerUrl, formData, function (data) {
                 $('.ui.mini.modal')
                     .modal({
                         closable  : true,
                         onApprove : function () {
-                            window.location.href = "/admin/index";
+                            window.location.href = registerSuccessfullyUrl;
                         },
                         onShow: function () {
                             $(this).find('.content').html(/*[[#{activationEmail.sentSuccessfully}]]*/);
@@ -185,6 +192,9 @@
                 $('.ui.mini.modal')
                     .modal({
                         closable  : true,
+                        onApprove : function () {
+                            window.location.reload();
+                        },
                         onShow: function () {
                             $(this).find('.content').html(msg);
                         }
