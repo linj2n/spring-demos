@@ -45,14 +45,6 @@ public class AccountResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "account/activate",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> activateAccount(@RequestParam(value = "key") String key) {
-        userService.activateRegistration(key);
-        return null;
-    }
-
     @RequestMapping(value = "/account/change_password",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
