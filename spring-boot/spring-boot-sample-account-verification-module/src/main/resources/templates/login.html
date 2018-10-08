@@ -54,7 +54,7 @@
                 </div>
                 <div class="inline field">
                     <a href="/register" th:href="@{/register}">注册</a>
-                    <a href="#">忘记密码?</a>
+                    <a href="#" id="forgetPwd">忘记密码?</a>
                 </div>
             </div>
         </form>
@@ -67,9 +67,30 @@
             </div>
         </div>
     </div>
-
 </div>
-
+<div class="ui small modal" id="resetPwdModal">
+    <div class="ui header">找回密码</div>
+    <div class="content">
+        <div class="ui tiny message" id="resetPwdMessage">
+            <div th:text="#{resetPwdEmail.sentSuccessfully}">重置密码的链接发送到您登记的邮箱中。</div>
+        </div>
+        <form class="ui small form" id="resetPwdForm" method="Get">
+            <div class="field">
+                <input type="text" id="needResetLogin" name="needResetLogin" placeholder="输入你的账号名或邮箱">
+                <!--<input type="hidden"-->
+                <!--th:name="${_csrf.parameterName}"-->
+                <!--th:value="${_csrf.token}" />-->
+            </div>
+            <div class="fields">
+                <div class="twelve wide field">
+                </div>
+                <div class="four wide field">
+                    <button class="fluid ui blue button" type="submit">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <div class="ui vertical footer ">
     <div class="ui center aligned container ">
       <span>
@@ -91,6 +112,7 @@
     var
         authenticationUrl = [[@{/api/account/authentication}]],
         loginPage = [[@{/login}]],
+        checkUserExistenceUrl = [[@{/api/account/existence}]],
         registerSuccessfullyUrl = [[@{/admin/index}]];
 
     $('.positive.message .close')
@@ -124,7 +146,6 @@
             }
         },
         highlight: function (element, errorClass) {
-            // $(element).removeClass(errorClass);
             $(element).parent().addClass("error");
         },
         unhighlight: function (element, errorClass) {
@@ -134,6 +155,7 @@
         errorElement: "div",
         errorClass: "ui pointing red basic label",
         submitHandler: function (form) {
+            $(form).find('[type=submit]').addClass('disabled');
             console.log("call form post ajax");
             var formData = $(form).serialize();
             $.post(authenticationUrl, formData, function (data) {
@@ -154,6 +176,72 @@
                     .modal('show')
                 ;
             });
+        }
+    })
+    ;
+
+    var $resetPwdModal = $('#resetPwdModal');
+    $('#forgetPwd').click(function () {
+        console.log('show the resetPwdModal');
+        $resetPwdModal
+            .modal('show')
+        ;
+    })
+    ;
+    var $resetPwdForm = $('#resetPwdForm');
+
+    $('#needResetLogin').on('focus',function () {
+        console.log('hide the message');
+        $resetPwdModal.find('.message').transition('hide');
+    })
+    ;
+    $resetPwdForm.validate({
+        onkeyup: false,
+        rules: {
+            needResetLogin: {
+                required: true,
+                minlength: 5,
+                remote: {
+                    url: checkUserExistenceUrl,
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        'login': function () {
+                            return $('#needResetLogin').val()
+                        }
+                    },
+                    dataFilter: function (data,type) {
+                        console.log(data);
+                        var result = jQuery.parseJSON(data);
+                        console.log(result);
+                        return result.existed;
+                    }
+                }
+            }
+        },
+        messages: {
+            needResetLogin: {
+                required: /*[[#{message.input.required}]]*/,
+                minlength: /*[[#{message.loginOrEmail.invalid}]]*/,
+                remote: /*[[#{message.emailOrLogin.notExist}]]*/
+            }
+        },
+        highlight: function (element, errorClass) {
+            $(element).parent().addClass("error");
+        },
+        unhighlight: function (element, errorClass) {
+            $(element).parent().removeClass("error");
+
+        },
+        focusCleanup: true,
+        errorElement: "div",
+        errorClass: "ui pointing below red basic label",
+        errorPlacement: function(error, element) {
+            error.insertBefore( element );
+        },
+        submitHandler: function (form) {
+            console.log("submit form to server");
+            $('#resetPwdMessage').transition('show');
         }
     })
     ;
