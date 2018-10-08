@@ -86,124 +86,127 @@
         registerSuccessfullyUrl = [[@{/admin/index}]];
 
         $('#registerForm').validate({
-        rules: {
-            login: {
-                required: true,
-                minlength: 5,
-                remote: {
-                    url: checkUserExistenceUrl,
-                    type: 'get',
-                    dataType: "json",
-                    data: {
-                        'login': function () {
-                            return $('#login').val()
+            onkeyup: false,
+            rules: {
+                login: {
+                    required: true,
+                    minlength: 5,
+                    remote: {
+                        url: checkUserExistenceUrl,
+                        type: 'get',
+                        dataType: "json",
+                        data: {
+                            'login': function () {
+                                return $('#login').val()
+                            }
+                        },
+                        dataFilter: function (data,type) {
+                            console.log(data);
+                            var result = jQuery.parseJSON(data);
+                            console.log(result);
+                            return !result.existed;
                         }
-                    },
-                    dataFilter: function (data,type) {
-                        console.log(data);
-                        var result = jQuery.parseJSON(data);
-                        console.log(result);
-                        return !result.existed;
                     }
+                },
+                email: {
+                    required: true,
+                    email: true,
+                    remote: {
+                        url: checkUserExistenceUrl,
+                        type: 'get',
+                        dataType: "json",
+                        data: {
+                            'email': function () {
+                                return $('#email').val()
+                            }
+                        },
+                        dataFilter: function (data,type) {
+                            console.log(data);
+                            var result = jQuery.parseJSON(data);
+                            console.log(result);
+                            return !result.existed;
+                        }
+                    }
+                },
+                password: {
+                    required: true,
+                    minlength: 8
+                },
+                matchPassword: {
+                    required: true,
+                    minlength: 8,
+                    equalTo: '#password'
                 }
             },
-            email: {
-                required: true,
-                email: true,
-                remote: {
-                    url: checkUserExistenceUrl,
-                    type: 'get',
-                    dataType: "json",
-                    data: {
-                        'email': function () {
-                            return $('#email').val()
-                        }
-                    },
-                    dataFilter: function (data,type) {
-                        console.log(data);
-                        var result = jQuery.parseJSON(data);
-                        console.log(result);
-                        return !result.existed;
-                    }
+            messages: {
+                login: {
+                    required: /*[[#{message.input.required}]]*/,
+                    minlength: /*[[#{message.login.invalid}]]*/,
+                    remote: /*[[#{message.login.alreadyExist}]]*/
+                },
+                email: {
+                    required: /*[[#{message.input.required}]]*/,
+                    email: /*[[#{message.email.invalid}]]*/,
+                    remote: /*[[#{message.email.alreadyExist}]]*/
+                },
+                password: {
+                    required: /*[[#{message.input.required}]]*/,
+                    minlength: /*[[#{message.password.invalid}]]*/
+                },
+                matchPassword: {
+                    required: /*[[#{message.input.required}]]*/,
+                    minlength: /*[[#{message.password.invalid}]]*/,
+                    equalTo: /*[[#{message.matchPassword.equalTo}]]*/
                 }
             },
-            password: {
-                required: true,
-                minlength: 8
+            highlight: function (element, errorClass) {
+                $(element).parent().addClass("error");
             },
-            matchPassword: {
-                required: true,
-                minlength: 8,
-                equalTo: '#password'
-            }
-        },
-        messages: {
-            login: {
-                required: /*[[#{message.input.required}]]*/,
-                minlength: /*[[#{message.login.invalid}]]*/,
-                remote: /*[[#{message.login.alreadyExist}]]*/
-            },
-            email: {
-                required: /*[[#{message.input.required}]]*/,
-                email: /*[[#{message.email.invalid}]]*/,
-                remote: /*[[#{message.email.alreadyExist}]]*/
-            },
-            password: {
-                required: /*[[#{message.input.required}]]*/,
-                minlength: /*[[#{message.password.invalid}]]*/
-            },
-            matchPassword: {
-                required: /*[[#{message.input.required}]]*/,
-                minlength: /*[[#{message.password.invalid}]]*/,
-                equalTo: /*[[#{message.matchPassword.equalTo}]]*/
-            }
-        },
-        highlight: function (element, errorClass) {
-            $(element).parent().addClass("error");
-        },
-        unhighlight: function (element, errorClass) {
-            $(element).parent().removeClass("error");
+            unhighlight: function (element, errorClass) {
+                $(element).parent().removeClass("error");
 
-        },
-        errorElement: "div",
-        errorClass: "ui pointing red basic label",
-        submitHandler: function (form) {
-            console.log("call form post ajax");
-            var formData = $(form).serialize();
-            $.post(registerUrl, formData, function (data) {
-                $('.ui.mini.modal')
-                    .modal({
-                        closable  : true,
-                        onApprove : function () {
-                            window.location.href = registerSuccessfullyUrl;
-                        },
-                        onShow: function () {
-                            $(this).find('.content').html(/*[[#{activationEmail.sentSuccessfully}]]*/);
-                        }
-                    })
-                    .modal('show')
+            },
+            focusCleanup: true,
+            errorElement: "div",
+            errorClass: "ui pointing red basic label",
+            submitHandler: function (form) {
+                console.log("call form post ajax");
+                var formData = $(form).serialize();
+                $(form).find('[type=submit]').addClass('disabled');
+                $.post(registerUrl, formData, function (data) {
+                    $('.ui.mini.modal')
+                        .modal({
+                            closable  : true,
+                            onApprove : function () {
+                                window.location.href = registerSuccessfullyUrl;
+                            },
+                            onShow: function () {
+                                $(this).find('.content').html(/*[[#{activationEmail.sentSuccessfully}]]*/);
+                            }
+                        })
+                        .modal('show')
+                    ;
+                }).fail(function (data) {
+                    var result = data.responseJSON;
+                    var msg = /*[[#{message.default.errorMsg}]]*/;
+                    if (result.error == "UserAlreadyExist") {
+                        msg = result.message;
+                    }
+                    $('.ui.mini.modal')
+                        .modal({
+                            closable  : true,
+                            onApprove : function () {
+                                window.location.reload();
+                            },
+                            onShow: function () {
+                                $(this).find('.content').html(msg);
+                            }
+                        })
+                        .modal('show')
+                    ;
+                })
                 ;
-            }).fail(function (data) {
-                var result = data.responseJSON;
-                var msg = /*[[#{message.default.errorMsg}]]*/;
-                if (result.error == "UserAlreadyExist") {
-                    msg = result.message;
-                }
-                $('.ui.mini.modal')
-                    .modal({
-                        closable  : true,
-                        onApprove : function () {
-                            window.location.reload();
-                        },
-                        onShow: function () {
-                            $(this).find('.content').html(msg);
-                        }
-                    })
-                    .modal('show')
-                ;
-            })
-            ;
-        }
+            }
     })
     ;
     /*]]>*/
