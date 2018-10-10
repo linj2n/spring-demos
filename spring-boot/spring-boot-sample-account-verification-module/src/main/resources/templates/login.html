@@ -28,7 +28,7 @@
 <body>
 <div class="ui middle aligned center aligned grid">
     <div class="left aligned column">
-        <div th:if="${param.message != null}" class="ui positive message">
+        <div th:if="${param.message != null}" class="ui  message">
             <i class="close icon"></i>
             <div th:text="${param.message}">msg</div>
         </div>
@@ -72,7 +72,7 @@
     <div class="ui header">找回密码</div>
     <div class="content">
         <div class="ui tiny message" id="resetPwdMessage">
-            <div th:text="#{resetPwdEmail.sentSuccessfully}">重置密码的链接发送到您登记的邮箱中。</div>
+            <div th:text="#{account.passwordResetRequest.succes}">重置密码的链接发送到您登记的邮箱中。</div>
         </div>
         <form class="ui small form" id="resetPwdForm" method="Get">
             <div class="field">
@@ -110,9 +110,9 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var
-        authenticationUrl = [[@{/api/account/authentication}]],
+        authenticationUrl = [[@{/api/v1/account/authentication}]],
         loginPage = [[@{/login}]],
-        checkUserExistenceUrl = [[@{/api/account/existence}]],
+        checkUserExistenceUrl = [[@{/api/v1/account/existence}]],
         registerSuccessfullyUrl = [[@{/admin/index}]];
 
     $('.positive.message .close')

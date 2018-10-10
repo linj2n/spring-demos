@@ -1,6 +1,8 @@
 package cn.linj2n.verification.web;
 
 import cn.linj2n.verification.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -11,9 +13,12 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 
 @Controller
 public class MainController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @Autowired
     UserService userService ;
@@ -42,14 +47,13 @@ public class MainController {
     }
 
     @RequestMapping(value = "/account/activate", method = RequestMethod.GET)
-    public String activateAccount(final WebRequest request, @RequestParam(value = "key") final String key, RedirectAttributes redirectAttrs) {
-        if (userService.activateRegistration(key).isPresent()) {
-            redirectAttrs.addAttribute("message",messageSource.getMessage("account.activatedSuccessfully",null,request.getLocale()));
-            return "redirect:/login";
+    public String activateAccount(Locale local,@RequestParam(value = "activationKey",required=true) final String activationKey, RedirectAttributes redirectAttrs) {
+        logger.info("Get URL /account/activate with key : {}" + activationKey);
+        if (userService.activateRegistration(activationKey).isPresent()) {
+            redirectAttrs.addAttribute("message",messageSource.getMessage("account.activatedSuccessfully",null,local));
         } else {
-            redirectAttrs.addAttribute("errorInfo",messageSource.getMessage("account.failedToActivate",null,request.getLocale()));
-            // TODO: Add error page.
-            return "redirect:/error";
+            redirectAttrs.addAttribute("message",messageSource.getMessage("account.failedToActivate",null,local));
         }
+        return "redirect:/login";
     }
 }

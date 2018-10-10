@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.Role;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +58,7 @@ public class UserService {
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         authority.ifPresent(authorities::add);
         newUser.setAuthorities(authorities);
+        logger.info("new user info : {}",newUser);
 
         // 4. save new user
         userRepository.save(newUser);
@@ -64,11 +66,36 @@ public class UserService {
     }
 
     public Optional<User> activateRegistration(String key) {
-        return userRepository.findOneByActivationKey(key);
+        logger.info("Activating user for activation key {}", key);
+        return userRepository.findOneByActivationKey(key).map(user -> {
+            user.setActivationKey(null);
+            user.setActivated(true);
+            userRepository.save(user);
+            logger.info("Activated user: {}", user);
+            return user;
+        });
     }
 
     public void changePassword(String password) {
         // TODO: changePassword
+    }
+
+    public Optional<User> requestPasswordReset(String email) {
+        // TODO: request password reset service
+        return userRepository.findOneByEmail(email)
+                .filter(User::isActivated)
+                .map(user -> {
+                    logger.info("Request password reset [email= {}].",email);
+                    user.setResetKey(RandomUtil.generateResetKey());
+                    user.setResetDate(ZonedDateTime.now());
+                    userRepository.save(user);
+                    return user;
+                });
+    }
+
+    public Optional<User> resetPassword(String newPassword, String email) {
+        // TODO: reset password with new password and email.
+        return Optional.empty();
     }
 
     public Boolean checkIfExitUserActivatedByLoginOrEmail(String login,String email) {
