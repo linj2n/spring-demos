@@ -3,7 +3,10 @@ package cn.linj2n.verification.web.rest;
 import cn.linj2n.verification.domain.User;
 import cn.linj2n.verification.service.EmailService;
 import cn.linj2n.verification.service.UserService;
+import cn.linj2n.verification.web.dto.ResponseDto;
 import cn.linj2n.verification.web.dto.UserDTO;
+import cn.linj2n.verification.web.errors.ErrorResponse;
+import cn.linj2n.verification.web.utils.ResponseGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class AccountResource {
 
     private final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
+    private static final String BASE_URL = "http://localhost:8080";
+
     @Autowired
     private UserService userService;
 
@@ -35,33 +40,51 @@ public class AccountResource {
     private EmailService emailService;
 
 
-    @RequestMapping(value = "account/register",
+    @RequestMapping(value = "/v1/account",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerAccount(@Valid UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<?> addAccount(@Valid UserDTO userDTO, HttpServletRequest request) {
         logger.info("Register a new Account: -----> UserDto {}", userDTO.toString());
         User user = userService.createUserInformation(userDTO.getLogin(), userDTO.getPassword(), userDTO.getLogin(), userDTO.getEmail());
-        emailService.sendActivationEmail(user, "http://localhost:8080");
+        emailService.sendActivationEmail(user, BASE_URL);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/account/change_password",
+    @RequestMapping(value = "/v1/account/password_reset/{token}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changePassword(@RequestBody String password) {
+    public ResponseEntity<?> changePassword(@RequestBody String resetKey, @RequestBody String login, @RequestBody String newPassword) {
 
         // TODO: change Password
         return null;
     }
 
-    @RequestMapping(value = "/account/existence",
+    @RequestMapping(value = "/v1/account/password_reset",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> requestPasswordReset(@ModelAttribute(value = "needResetEmail") String needResetEmail, Locale local) {
+        // TODO: request to reset password, create reset key and send pwd_reset email to user .
+        logger.info("Start to request password_reset . needResetEmail: {}", needResetEmail);
+        ResponseDto successResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordResetRequest.success",null,local));
+        ResponseDto failedResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordResetRequest.failed",null,local));
+        return userService.requestPasswordReset(needResetEmail)
+                .map(user -> {
+                    emailService.sendPasswordResetMail(user, BASE_URL);
+                    logger.info("Request SUCCESS: {}" + successResponse.getMessage());
+                    return new ResponseEntity<>(successResponse,HttpStatus.CREATED);
+                })
+                .orElse(new ResponseEntity<>(failedResponse,HttpStatus.BAD_REQUEST));
+    }
+
+
+    @RequestMapping(value = "/v1/account/existence",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Map checkIfExistUser(@RequestParam(value = "login", required = false, defaultValue = "") final String login,
                                               @RequestParam(value = "email", required = false, defaultValue = "") final String email) {
         Map<String,Boolean> result = new HashMap<>();
         result.put("existed",userService.checkIfExitUserActivatedByLoginOrEmail(login, email));
-        logger.info("Get url(/account/existence) result : --------> " + result.get("existed"));
+        logger.info("Get url(/v1/account/existence) [login=" + login +" ,email="+ email+"], result :--------> " + result.get("existed"));
         return result;
     }
 }

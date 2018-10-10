@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Entity
@@ -52,6 +53,9 @@ public class User implements  Serializable {
     @Size(max = 20)
     @Column(name = "reset_key", length = 20)
     private String resetKey;
+
+    @Column(name = "reset_date", nullable = true)
+    private ZonedDateTime resetDate = null;
 
     @JsonIgnore
     @ManyToMany
@@ -131,6 +135,14 @@ public class User implements  Serializable {
         this.resetKey = resetKey;
     }
 
+    public ZonedDateTime getResetDate() {
+        return resetDate;
+    }
+
+    public void setResetDate(ZonedDateTime resetDate) {
+        this.resetDate = resetDate;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -168,6 +180,8 @@ public class User implements  Serializable {
                 ", activated=" + activated +
                 ", activationKey='" + activationKey + '\'' +
                 ", resetKey='" + resetKey + '\'' +
+                ", resetDate=" + resetDate +
+                ", authorities=" + authorities +
                 '}';
     }
 

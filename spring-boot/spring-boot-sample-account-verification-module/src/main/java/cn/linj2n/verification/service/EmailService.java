@@ -60,6 +60,7 @@ public class EmailService {
     @Async
     public void sendActivationEmail(User user, String baseUrl) {
         logger.debug("Sending activation e-mail to '{}'", user.getEmail());
+        /* Only support zh_CN language */
         Locale locale = new Locale("zh","CN");
         Context context = new Context(locale);
         context.setVariable("user", user);
@@ -69,7 +70,16 @@ public class EmailService {
         sendEmail(user.getEmail(), subject, content, false, true);
     }
 
+    @Async
     public void sendPasswordResetMail(User user, String baseUrl) {
-        // TODO:
+        logger.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        /* Only support zh_CN language */
+        Locale locale = new Locale("zh","CN");
+        Context context = new Context(locale);
+        context.setVariable("user", user);
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("mails/resetPasswordEmail", context);
+        String subject = messageSource.getMessage("email.resetPwd.title", null, locale);
+        sendEmail(user.getEmail(),subject,content,false,true);
     }
 }

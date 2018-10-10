@@ -81,8 +81,8 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var
-        registerUrl = [[@{/api/account/register}]],
-        checkUserExistenceUrl = [[@{/api/account/existence}]],
+        registerUrl = [[@{/api/v1/account}]],
+        checkUserExistenceUrl = [[@{/api/v1/account/existence}]],
         registerSuccessfullyUrl = [[@{/admin/index}]];
 
         $('#registerForm').validate({

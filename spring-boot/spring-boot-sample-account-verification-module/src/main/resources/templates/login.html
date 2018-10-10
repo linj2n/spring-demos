@@ -71,15 +71,14 @@
 <div class="ui small modal" id="resetPwdModal">
     <div class="ui header">找回密码</div>
     <div class="content">
-        <div class="ui tiny message" id="resetPwdMessage">
-            <div th:text="#{account.passwordResetRequest.succes}">重置密码的链接发送到您登记的邮箱中。</div>
+        <div class="ui tiny hidden message" id="resetPwdMessage"><p>重置密码提示信息</p>
         </div>
         <form class="ui small form" id="resetPwdForm" method="Get">
             <div class="field">
-                <input type="text" id="needResetLogin" name="needResetLogin" placeholder="输入你的账号名或邮箱">
-                <!--<input type="hidden"-->
-                <!--th:name="${_csrf.parameterName}"-->
-                <!--th:value="${_csrf.token}" />-->
+                <input type="text" id="needResetEmail" name="needResetEmail" placeholder="输入你账号所关联的邮箱">
+                <input type="hidden"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}" />
             </div>
             <div class="fields">
                 <div class="twelve wide field">
@@ -113,6 +112,7 @@
         authenticationUrl = [[@{/api/v1/account/authentication}]],
         loginPage = [[@{/login}]],
         checkUserExistenceUrl = [[@{/api/v1/account/existence}]],
+        passwordResetUrl = [[@{/api/v1/account/password_reset}]],
         registerSuccessfullyUrl = [[@{/admin/index}]];
 
     $('.positive.message .close')
@@ -190,7 +190,7 @@
     ;
     var $resetPwdForm = $('#resetPwdForm');
 
-    $('#needResetLogin').on('focus',function () {
+    $('#needResetEmail').on('focus',function () {
         console.log('hide the message');
         $resetPwdModal.find('.message').transition('hide');
     })
@@ -198,16 +198,16 @@
     $resetPwdForm.validate({
         onkeyup: false,
         rules: {
-            needResetLogin: {
+            needResetEmail: {
                 required: true,
-                minlength: 5,
+                email: true,
                 remote: {
                     url: checkUserExistenceUrl,
                     type: 'get',
                     dataType: "json",
                     data: {
-                        'login': function () {
-                            return $('#needResetLogin').val()
+                        'email': function () {
+                            return $('#needResetEmail').val();
                         }
                     },
                     dataFilter: function (data,type) {
@@ -220,9 +220,9 @@
             }
         },
         messages: {
-            needResetLogin: {
+            needResetEmail: {
                 required: /*[[#{message.input.required}]]*/,
-                minlength: /*[[#{message.loginOrEmail.invalid}]]*/,
+                email: /*[[#{message.email.invalid}]]*/,
                 remote: /*[[#{message.emailOrLogin.notExist}]]*/
             }
         },
@@ -241,7 +241,22 @@
         },
         submitHandler: function (form) {
             console.log("submit form to server");
-            $('#resetPwdMessage').transition('show');
+            var formData = $(form).serialize();
+            var $resetPwdMessage = $('#resetPwdMessage');
+            $.post(passwordResetUrl,formData,function (data) {
+                $resetPwdMessage.text(data.responseJSON.message);
+                $resetPwdMessage.transition('show');
+            }).fail(function (data) {
+                console.log("request password reset failed.");
+                if (data.responseJSON) {
+                    console.log(data.responseJSON);
+                    $resetPwdMessage.text(data.responseJSON.message);
+                } else {
+                    console.log(data.responseJSON);
+                    $resetPwdMessage.text(data);
+                }
+                $resetPwdMessage.transition('show');
+            });
         }
     })
     ;

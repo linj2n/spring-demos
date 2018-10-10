@@ -56,4 +56,15 @@ public class MainController {
         }
         return "redirect:/login";
     }
+
+    @RequestMapping(value = "/account/resetPassword",method = RequestMethod.GET)
+    public String getPasswordResetPage(){
+        return "resetPassword";
+    }
+
+//    @RequestMapping(value = "/account/resetPassword",method = RequestMethod.POST)
+//    public String getPasswordResetPage(){
+//        return "resetPassword";
+//    }
+
 }

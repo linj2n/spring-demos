@@ -21,6 +21,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         super();
     }
 
+
+
     // 409
     @ExceptionHandler({ UserAlreadyExistException.class})
     public ResponseEntity<Object> handleUserAlreadyExist(final RuntimeException ex, final WebRequest request) {
