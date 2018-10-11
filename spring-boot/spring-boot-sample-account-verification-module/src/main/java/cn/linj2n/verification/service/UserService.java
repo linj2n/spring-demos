@@ -104,8 +104,7 @@ public class UserService {
         User user = userRepository.findOneByLoginOrEmail(login.toLowerCase(), email.toLowerCase()).orElse(null);
         return user != null && user.isActivated();
     }
-    public Boolean checkIfValidResetPwdKey(String token) {
-        User user = userRepository.findOneByActivationKey(token).orElse(null);
-        return user != null && user.isActivated();
+    public Optional<User> getUserByPasswordResetKey(String key) {
+        return userRepository.findOneByActivationKey(key).filter(User::isActivated);
     }
 }
