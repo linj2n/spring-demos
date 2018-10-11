@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>注册</title>
+    <title>登录</title>
 
     <link href="https://cdn.bootcss.com/semantic-ui/2.3.1/semantic.css" rel="stylesheet">
     <style type="text/css">
@@ -28,9 +28,12 @@
 <body>
 <div class="ui middle aligned center aligned grid">
     <div class="left aligned column">
-        <div th:if="${param.message != null}" class="ui  message">
-            <i class="close icon"></i>
-            <div th:text="${param.message}">msg</div>
+        <div th:if="${message != null || error != null}">
+            <div th:class="${message != null } ? 'ui positive message' : 'ui negative message'" id="msg">
+                <i class="close icon"></i>
+                <div th:text="${message}">msg</div>
+                <div th:text="${error}">msg</div>
+            </div>
         </div>
         <form th:action="@{/api/account/authentication}" class="ui large form" id="loginForm" method="post">
             <div class="ui raised segment">
@@ -54,7 +57,7 @@
                 </div>
                 <div class="inline field">
                     <a href="/register" th:href="@{/register}">注册</a>
-                    <a href="#" id="forgetPwd">忘记密码?</a>
+                    <a href="/account/forget_password" id="forgetPwd">忘记密码?</a>
                 </div>
             </div>
         </form>
@@ -66,28 +69,6 @@
                 <div class="ui approve blue button">确定</div>
             </div>
         </div>
-    </div>
-</div>
-<div class="ui small modal" id="resetPwdModal">
-    <div class="ui header">找回密码</div>
-    <div class="content">
-        <div class="ui tiny hidden message" id="resetPwdMessage"><p>重置密码提示信息</p>
-        </div>
-        <form class="ui small form" id="resetPwdForm" method="Get">
-            <div class="field">
-                <input type="text" id="needResetEmail" name="needResetEmail" placeholder="输入你账号所关联的邮箱">
-                <input type="hidden"
-                th:name="${_csrf.parameterName}"
-                th:value="${_csrf.token}" />
-            </div>
-            <div class="fields">
-                <div class="twelve wide field">
-                </div>
-                <div class="four wide field">
-                    <button class="fluid ui blue button" type="submit">重置</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 <div class="ui vertical footer ">
@@ -109,13 +90,13 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var
+        serverContext = [[@{/}]],
         authenticationUrl = [[@{/api/v1/account/authentication}]],
         loginPage = [[@{/login}]],
         checkUserExistenceUrl = [[@{/api/v1/account/existence}]],
-        passwordResetUrl = [[@{/api/v1/account/password_reset}]],
-        registerSuccessfullyUrl = [[@{/admin/index}]];
+        loginSuccessfullyUrl = [[@{/admin/index}]];
 
-    $('.positive.message .close')
+    $('#msg').find('.close')
         .on('click', function () {
             $(this)
                 .closest('.message')
@@ -160,7 +141,7 @@
             var formData = $(form).serialize();
             $.post(authenticationUrl, formData, function (data) {
                 console.log("submit to server ------> success");
-                window.location.href = registerSuccessfullyUrl;
+                window.location.href = loginSuccessfullyUrl;
             }).fail(function (data) {
                 var errors = data.responseJSON.message;
                 $('.ui.mini.modal')
@@ -180,86 +161,7 @@
     })
     ;
 
-    var $resetPwdModal = $('#resetPwdModal');
-    $('#forgetPwd').click(function () {
-        console.log('show the resetPwdModal');
-        $resetPwdModal
-            .modal('show')
-        ;
-    })
-    ;
-    var $resetPwdForm = $('#resetPwdForm');
 
-    $('#needResetEmail').on('focus',function () {
-        console.log('hide the message');
-        $resetPwdModal.find('.message').transition('hide');
-    })
-    ;
-    $resetPwdForm.validate({
-        onkeyup: false,
-        rules: {
-            needResetEmail: {
-                required: true,
-                email: true,
-                remote: {
-                    url: checkUserExistenceUrl,
-                    type: 'get',
-                    dataType: "json",
-                    data: {
-                        'email': function () {
-                            return $('#needResetEmail').val();
-                        }
-                    },
-                    dataFilter: function (data,type) {
-                        console.log(data);
-                        var result = jQuery.parseJSON(data);
-                        console.log(result);
-                        return result.existed;
-                    }
-                }
-            }
-        },
-        messages: {
-            needResetEmail: {
-                required: /*[[#{message.input.required}]]*/,
-                email: /*[[#{message.email.invalid}]]*/,
-                remote: /*[[#{message.emailOrLogin.notExist}]]*/
-            }
-        },
-        highlight: function (element, errorClass) {
-            $(element).parent().addClass("error");
-        },
-        unhighlight: function (element, errorClass) {
-            $(element).parent().removeClass("error");
-
-        },
-        focusCleanup: true,
-        errorElement: "div",
-        errorClass: "ui pointing below red basic label",
-        errorPlacement: function(error, element) {
-            error.insertBefore( element );
-        },
-        submitHandler: function (form) {
-            console.log("submit form to server");
-            var formData = $(form).serialize();
-            var $resetPwdMessage = $('#resetPwdMessage');
-            $.post(passwordResetUrl,formData,function (data) {
-                $resetPwdMessage.text(data.responseJSON.message);
-                $resetPwdMessage.transition('show');
-            }).fail(function (data) {
-                console.log("request password reset failed.");
-                if (data.responseJSON) {
-                    console.log(data.responseJSON);
-                    $resetPwdMessage.text(data.responseJSON.message);
-                } else {
-                    console.log(data.responseJSON);
-                    $resetPwdMessage.text(data);
-                }
-                $resetPwdMessage.transition('show');
-            });
-        }
-    })
-    ;
     /*]]>*/
 </script>
 </body>
