@@ -36,18 +36,20 @@ public class UserService {
 
     public User createUserInformation(String login, String password, String username, String email) {
 
+        /* Users who have already ACTIVATED are not allowed to register */
         if (checkIfExitUserActivatedByLoginOrEmail(login,email)) {
             throw new UserAlreadyExistException("User has already existed. [login=" + login + ",email=" + email + "]");
         }
 
-        User newUser = new User();
+        User newUser = userRepository.findOneByLoginOrEmail(login, email).filter(user -> !user.isActivated()).orElse(new User());
+        logger.info("new User info : {}", newUser);
 
-        // 1. preparing for security
+        /*1. preparing for security*/
         Set<Authority> authorities = new HashSet<>();
-        Optional<Authority> authority = authorityRepository.findOneByName("ROLE_USER");
+        Optional<Authority> authority = authorityRepository.findOneByName("ROLE_ADMIN");
         String encrytedPassword = passwordEncoder.encode(password);
 
-        // 2. init newUser
+        /*2. set newUser properties*/
         newUser.setLogin(login);
         newUser.setPassword(encrytedPassword);
         newUser.setUsername(username);
@@ -60,7 +62,7 @@ public class UserService {
         newUser.setAuthorities(authorities);
         logger.info("new user info : {}",newUser);
 
-        // 4. save new user
+        /* 4. save new user*/
         userRepository.save(newUser);
         return newUser;
     }
@@ -102,5 +104,8 @@ public class UserService {
         User user = userRepository.findOneByLoginOrEmail(login.toLowerCase(), email.toLowerCase()).orElse(null);
         return user != null && user.isActivated();
     }
-
+    public Boolean checkIfValidResetPwdKey(String token) {
+        User user = userRepository.findOneByActivationKey(token).orElse(null);
+        return user != null && user.isActivated();
+    }
 }
