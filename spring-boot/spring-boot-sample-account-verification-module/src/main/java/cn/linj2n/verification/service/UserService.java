@@ -79,9 +79,8 @@ public class UserService {
     }
 
     public Optional<User> requestPasswordReset(String email) {
-        // TODO: request password reset service
         return userRepository.findOneByEmail(email)
-//                .filter(User::isActivated)
+                .filter(User::isActivated)
                 .map(user -> {
                     logger.info("Request password reset [email= {}].",email);
                     user.setResetKey(RandomUtil.generateResetKey());

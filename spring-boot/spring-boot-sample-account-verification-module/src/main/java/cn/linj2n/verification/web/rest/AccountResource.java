@@ -54,7 +54,6 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@PathVariable(value = "resetKey") final String resetKey, @ModelAttribute(value = "newPassword") final String newPassword,Locale local) {
-        // TODO: change Password
         logger.info("Start to request password_reset . resetKey: {}", resetKey);
         ResponseDto successResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordReset.success",null,local));
         ResponseDto failedResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordReset.failed",null,local));

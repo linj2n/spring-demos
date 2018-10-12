@@ -24,8 +24,7 @@ public class AjaxAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-//        Locale locale = request.getLocale();
-        Locale locale = new Locale("zh","CN");
+        Locale locale = request.getLocale();
         if (exception.getMessage().equalsIgnoreCase("account.user.notActivated")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,messageSource.getMessage(exception.getMessage(),null,locale));
         } else {
