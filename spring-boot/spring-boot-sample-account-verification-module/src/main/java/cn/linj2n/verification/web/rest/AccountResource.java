@@ -50,20 +50,26 @@ public class AccountResource {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/v1/account/password_reset/{token}",
+    @RequestMapping(value = "/v1/account/password_reset/{resetKey}",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changePassword(@RequestBody String resetKey, @RequestBody String login, @RequestBody String newPassword) {
-
+    public ResponseEntity<?> changePassword(@PathVariable(value = "resetKey") final String resetKey, @ModelAttribute(value = "newPassword") final String newPassword,Locale local) {
         // TODO: change Password
-        return null;
+        logger.info("Start to request password_reset . resetKey: {}", resetKey);
+        ResponseDto successResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordReset.success",null,local));
+        ResponseDto failedResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordReset.failed",null,local));
+        return userService.resetPassword(newPassword,resetKey)
+                .map(user -> {
+                    return new ResponseEntity<>(successResponse, HttpStatus.OK);
+                })
+                .orElse(new ResponseEntity<>(failedResponse,HttpStatus.BAD_REQUEST));
+
     }
 
     @RequestMapping(value = "/v1/account/password_reset",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> requestPasswordReset(@ModelAttribute(value = "needResetEmail") String needResetEmail, Locale local) {
-        // TODO: request to reset password, create reset key and send pwd_reset email to user .
         logger.info("Start to request password_reset . needResetEmail: {}", needResetEmail);
         ResponseDto successResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordResetRequest.success",null,local));
         ResponseDto failedResponse = ResponseGenerator.buildSuccessResponse(messageSource.getMessage("account.passwordResetRequest.failed",null,local));

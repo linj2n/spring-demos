@@ -1,5 +1,6 @@
 package cn.linj2n.verification.web;
 
+import cn.linj2n.verification.domain.User;
 import cn.linj2n.verification.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class MainController {
         if (userService.activateRegistration(activationKey).isPresent()) {
             attributes.addFlashAttribute("message",messageSource.getMessage("account.activatedSuccessfully",null,local));
         } else {
-            attributes.addFlashAttribute("error",messageSource.getMessage("account.failedToActivate",null,local));
+            attributes.addFlashAttribute("error",messageSource.getMessage("account.wrongActivationLink",null,local));
         }
         return "redirect:/login";
     }
@@ -66,11 +67,14 @@ public class MainController {
     }
     @RequestMapping(value = "/account/password_reset/{resetKey}", method = RequestMethod.GET)
     public ModelAndView getPasswordResetView(@PathVariable final String resetKey, ModelMap model, Locale local) {
-        if (!userService.checkIfValidResetPwdKey(resetKey)) {
+        User user = userService.getUserByPasswordResetKey(resetKey).orElse(null);
+        if (user == null) {
             logger.info("Get URL /account/password_reset/{} : Wrong Key.", resetKey);
-            model.addAttribute("error",messageSource.getMessage("account.failedToActivate",null,local));
+            model.addAttribute("error",messageSource.getMessage("account.wrongResetLink",null,local));
             return new ModelAndView("login",model);
         }
+        model.addAttribute("user", user);
+        model.addAttribute("resetKey", resetKey);
         return new ModelAndView("/password_reset", model);
     }
     @RequestMapping(value = "/account/password_reset/{resetKey}", method = RequestMethod.POST)

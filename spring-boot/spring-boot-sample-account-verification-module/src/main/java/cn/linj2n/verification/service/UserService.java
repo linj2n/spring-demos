@@ -78,10 +78,6 @@ public class UserService {
         });
     }
 
-    public void changePassword(String password) {
-        // TODO: changePassword
-    }
-
     public Optional<User> requestPasswordReset(String email) {
         // TODO: request password reset service
         return userRepository.findOneByEmail(email)
@@ -95,9 +91,17 @@ public class UserService {
                 });
     }
 
-    public Optional<User> resetPassword(String newPassword, String email) {
-        // TODO: reset password with new password and email.
-        return Optional.empty();
+    public Optional<User> resetPassword(String newPassword, String resetKey) {
+        return userRepository.findOneByResetKey(resetKey)
+                .map(user -> {
+                  logger.info("Reset password [resetKey = {}].",resetKey);
+                    logger.info("Reset password [newPassword = {}].",newPassword);
+                  String encrytedPassword = passwordEncoder.encode(newPassword);
+                  user.setPassword(encrytedPassword);
+                  user.setResetDate(null);
+                  user.setResetKey(null);
+                  return user;
+                });
     }
 
     public Boolean checkIfExitUserActivatedByLoginOrEmail(String login,String email) {
@@ -105,6 +109,6 @@ public class UserService {
         return user != null && user.isActivated();
     }
     public Optional<User> getUserByPasswordResetKey(String key) {
-        return userRepository.findOneByActivationKey(key).filter(User::isActivated);
+        return userRepository.findOneByResetKey(key).filter(User::isActivated);
     }
 }
