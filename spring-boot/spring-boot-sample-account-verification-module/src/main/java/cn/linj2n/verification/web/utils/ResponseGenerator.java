@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 
 public class ResponseGenerator {
 
-    public static final String DEFAULT_SUCCESS_STATUS = "success";
-    public static final String DEFAULT_FAILED_STATUS = "fail";
+    private static final String DEFAULT_SUCCESS_STATUS = "success";
+    private static final String DEFAULT_FAILED_STATUS = "fail";
 
     public static ResponseDto buildHttpResponse(HttpStatus status){
         return new ResponseDto()
