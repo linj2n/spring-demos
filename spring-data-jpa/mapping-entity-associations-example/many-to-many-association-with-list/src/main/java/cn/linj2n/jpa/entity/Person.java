@@ -20,13 +20,37 @@ public class Person implements Serializable {
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
-            CascadeType.PERSIST
-    },fetch = FetchType.EAGER)
+            CascadeType.MERGE
+    },fetch = FetchType.LAZY)
     @JoinTable(name = "person_address",
             joinColumns = @JoinColumn(name = "person_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id")
     )
     private List<Address> addresses = new ArrayList<>();
+
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.getPersonList().add(this);
+    }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.getPersonList().remove(this);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return id != null && id.equals(person.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 
     protected Person() { // JPA 的规范要求无参构造函数；设为 protected 防止直接使用
     }
@@ -60,35 +84,12 @@ public class Person implements Serializable {
         this.age = age;
     }
 
-    public void addAddress(Address address) {
-        addresses.add(address);
-        address.getPersonList().add(this);
-    }
-
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.getPersonList().remove(this);
-    }
-
     public List<Address> getAddresses() {
         return addresses;
     }
 
     public void setAddresses(List<Address> addresses) {
         this.addresses = addresses;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person)) return false;
-        Person person = (Person) o;
-        return id != null && id.equals(person.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31;
     }
 
     @Override

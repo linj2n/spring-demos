@@ -2,7 +2,8 @@ package cn.linj2n.jpa.repository;
 
 import cn.linj2n.jpa.entity.Address;
 import cn.linj2n.jpa.entity.Person;
-import org.junit.Assert;
+import cn.linj2n.jpa.service.AddressService;
+import cn.linj2n.jpa.service.PersonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -19,10 +23,10 @@ import static org.junit.Assert.*;
 public class PersonRepositoryTest {
 
     @Autowired
-    private PersonRepository personRepository;
+    private PersonService personService;
 
     @Autowired
-    private AddressRepository addressRepository;
+    private AddressService addressService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryTest.class);
 
@@ -31,32 +35,16 @@ public class PersonRepositoryTest {
         Person john = new Person("John",18);
         Address addressA = new Address("XLL","ShenZhen","GuangDong","CN");
         Address addressB = new Address("XLL","GuangZhou","GuangDong","CN");
-        john.addAddress(addressA);
-        john.addAddress(addressB);
-        personRepository.save(john);
+        List<Address> addresses = new ArrayList<>();
+        addresses.add(addressA);
+        addresses.add(addressB);
+        personService.createPersonInformation("John", 18, addresses);
     }
 
     @Test
-    public void testCRUD() {
-        Person john = personRepository.findPersonByName("John");
-        Assert.assertNotNull(john);
-        Assert.assertNotNull(addressRepository.findAll());
-        Address address = john.getAddresses().get(0);
-        address.setStreet("DLL");
-        personRepository.saveAndFlush(john);
-
-        Assert.assertNotNull(addressRepository.findByStreet);
-
-        john = personRepository.findPersonByName("John");
-        address = john.getAddresses().get(0);
-        Assert.assertEquals("DLL",address.getStreet());
-
-        Address address1 = new Address("DLL","ShenZhen","GuangDong","CN");
-        john.removeAddress(address1);
-
-        personRepository.saveAndFlush(john);
-        john = personRepository.findPersonByName("John");
-        Assert.assertEquals(1,john.getAddresses().size());
+    public void test_Cascade_Delete_Operation() {
+        addressService.deleteAddressById(1L);
+        assertEquals(personService.findOneById(1L).getAddresses().size(),1);
     }
 
 }
