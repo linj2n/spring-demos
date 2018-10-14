@@ -8,4 +8,7 @@
  */
 
 rootProject.name = 'mapping-entity-associations-example'
-include 'one-to-one-bidirectional-mapping','one-to-one-unidirectional-mapping'
+include  'one-to-one-shared-primary-key', 'one-to-one-unidirectional-association','one-to-one-bidirectional-mapping',
+        'one-to-many-unidirectional-association','one-to-many-bidirectional-association',
+        'many-to-many-association-with-set', 'many-to-many-association-with-list',
+        'many-to-one-association'
