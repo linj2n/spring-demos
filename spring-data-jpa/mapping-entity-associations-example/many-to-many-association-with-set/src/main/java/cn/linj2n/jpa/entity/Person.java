@@ -2,8 +2,10 @@ package cn.linj2n.jpa.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.*;
 
-@Entity
+@Entity(name = "Person")
+@Table(name = "person")
 public class Person implements Serializable {
 
     @Id
@@ -13,6 +15,47 @@ public class Person implements Serializable {
     private String name;
 
     private Integer age;
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    },fetch = FetchType.LAZY)
+    @JoinTable(name = "person_address",
+            joinColumns = @JoinColumn(name = "person_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private Set<Address> addresses = new HashSet<>();
+
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.getPersons().add(this);
+    }
+
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.getPersons().remove(this);
+    }
+
+    public Set<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(Set<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return id != null && id.equals(person.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 
     protected Person() { // JPA 的规范要求无参构造函数；设为 protected 防止直接使用
     }

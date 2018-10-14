@@ -1,6 +1,7 @@
 package cn.linj2n.jpa.entity;
 
 import javax.persistence.*;
+import java.util.*;
 
 @Entity
 public class Address {
@@ -16,18 +17,10 @@ public class Address {
 
     private String country;
 
-    @ManyToOne
-    private Person person;
+    @ManyToMany(mappedBy = "addresses")
+    private Set<Person> persons = new HashSet<>();
 
     protected Address(){
-    }
-
-    public Address(String street, String city, String province, String country,Person person) {
-        this.street = street;
-        this.city = city;
-        this.province = province;
-        this.country = country;
-        this.person = person;
     }
 
     public Address(String street, String city, String province, String country) {
@@ -78,16 +71,30 @@ public class Address {
         this.country = country;
     }
 
+    public Set<Person> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(Set<Person> persons) {
+        this.persons = persons;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address)) return false;
+        Address address = (Address) o;
+        return id != null && id.equals(address.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
+
     @Override
     public String toString() {
         return String.format("address {id=%d,info='%s','%s','%s','%s'}",id,street,city,province,country);
     }
 
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
 }

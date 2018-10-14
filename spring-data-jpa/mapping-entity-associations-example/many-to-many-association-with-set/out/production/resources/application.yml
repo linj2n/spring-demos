@@ -10,5 +10,5 @@ spring:
     hibernate:
       ddl-auto: create-drop
 server:
-  port: 8188
+  port: 8088
 
