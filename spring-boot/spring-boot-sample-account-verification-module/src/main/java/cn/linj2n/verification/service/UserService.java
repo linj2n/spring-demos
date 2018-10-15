@@ -47,11 +47,11 @@ public class UserService {
         /*1. preparing for security*/
         Set<Authority> authorities = new HashSet<>();
         Optional<Authority> authority = authorityRepository.findOneByName("ROLE_ADMIN");
-        String encrytedPassword = passwordEncoder.encode(password);
+        String encryptedPassword = passwordEncoder.encode(password);
 
         /*2. set newUser properties*/
         newUser.setLogin(login);
-        newUser.setPassword(encrytedPassword);
+        newUser.setPassword(encryptedPassword);
         newUser.setUsername(username);
         newUser.setEmail(email);
         // new user is not active
@@ -95,8 +95,8 @@ public class UserService {
                 .map(user -> {
                   logger.info("Reset password [resetKey = {}].",resetKey);
                     logger.info("Reset password [newPassword = {}].",newPassword);
-                  String encrytedPassword = passwordEncoder.encode(newPassword);
-                  user.setPassword(encrytedPassword);
+                  String encryptedPassword = passwordEncoder.encode(newPassword);
+                  user.setPassword(encryptedPassword);
                   user.setResetDate(null);
                   user.setResetKey(null);
                   return user;
