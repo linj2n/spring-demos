@@ -4,6 +4,7 @@ export function register(data) {
   return request({
     url: '/api/v1/account',
     method: 'post',
+    withCredentials: true,
     data
   })
 }
@@ -13,6 +14,7 @@ export function checkUsernameOrEmailExistence(login, email) {
   return request({
     url: '/api/v1/account/existence',
     method: 'get',
+    withCredentials: true,
     params: {
       login: login,
       email: email || ''

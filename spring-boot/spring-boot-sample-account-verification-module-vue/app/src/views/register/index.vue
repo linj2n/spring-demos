@@ -8,7 +8,7 @@
       auto-complete="on"
       label-position="left"
     >
-      <h3 class="title">注 册</h3>
+      <h3 class="title">Register</h3>
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user"/>

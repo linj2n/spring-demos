@@ -4,10 +4,11 @@ import store from '../store'
 import { getToken } from '@/utils/auth'
 
 // 创建axios实例
+axios.defaults.withCredentials = true
 const service = axios.create({
   // config
   baseURL: process.env.BASE_API, // api 的 base_url
-  timeout: 5000 // 请求超时时间
+  timeout: 5000// 请求超时时间
 })
 
 // request拦截器
@@ -32,7 +33,7 @@ service.interceptors.response.use(
      * code为非20000是抛错 可结合自己业务进行修改
      */
     const res = response.data
-    if (res.code !== 20000) {
+    if (response.status !== 200 && res.code !== 20000) {
       Message({
         message: res.message,
         type: 'error',
@@ -57,6 +58,7 @@ service.interceptors.response.use(
       }
       return Promise.reject('error')
     } else {
+      console.log(response)
       return response.data
     }
   },

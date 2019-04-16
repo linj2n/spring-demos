@@ -55,7 +55,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-
+import { getMessage } from '@/api/login'
 export default {
   name: 'Login',
   data() {
@@ -118,7 +118,10 @@ export default {
             .then(() => {
               this.loading = false
               // 动态导航到 this.redirect
-              this.$router.push({ path: this.redirect || '/' })
+              // this.$router.push({ path: '/' })
+              getMessage().then(response => {
+                console.log(response)
+              })
             })
             .catch(() => {
               this.loading = false
