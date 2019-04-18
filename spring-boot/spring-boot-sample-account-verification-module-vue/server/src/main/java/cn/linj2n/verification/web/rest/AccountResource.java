@@ -1,10 +1,13 @@
 package cn.linj2n.verification.web.rest;
 
+import cn.linj2n.verification.domain.Authority;
 import cn.linj2n.verification.domain.User;
+import cn.linj2n.verification.security.SecurityUtil;
 import cn.linj2n.verification.service.EmailService;
 import cn.linj2n.verification.service.UserService;
 import cn.linj2n.verification.web.dto.ResponseDTO;
 import cn.linj2n.verification.web.dto.UserDTO;
+import cn.linj2n.verification.web.dto.support.ResponseCode;
 import cn.linj2n.verification.web.errors.ErrorResponse;
 import cn.linj2n.verification.web.utils.ResponseGenerator;
 import org.slf4j.Logger;
@@ -21,6 +24,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -48,6 +52,20 @@ public class AccountResource {
         User user = userService.createUserInformation(userDTO.getPassword(), userDTO.getUsername(), userDTO.getEmail());
         emailService.sendActivationEmail(user, BASE_URL);
         return new ResponseEntity<>(ResponseGenerator.buildSuccessResponse(), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/v1/account",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAccountInfo() {
+        return userService.getUserByUsername(SecurityUtil.getCurrentUserLogin())
+                .map(user -> {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setUsername(user.getUsername());
+                    userDTO.setEmail(user.getEmail());
+                    userDTO.setAuthorities(user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
+                    return new ResponseEntity<>(ResponseGenerator.buildSuccessResponse(userDTO), HttpStatus.OK);
+                }).orElse(new ResponseEntity<>(ResponseGenerator.buildFailedResponse(ResponseCode.INTERNAL_SERVER_ERROR),HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     @RequestMapping(value = "/v1/account/password_reset/{resetKey}",

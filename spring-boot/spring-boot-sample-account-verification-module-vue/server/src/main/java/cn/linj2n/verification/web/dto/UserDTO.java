@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 public class UserDTO {
 
@@ -18,6 +19,8 @@ public class UserDTO {
     @NotNull
     @Size(min = 1,message = "{message.password.required}")
     private String password;
+
+    private Set<String> authorities;
 
     public String getUsername() {
         return username;
@@ -43,12 +46,21 @@ public class UserDTO {
         this.password = password;
     }
 
+    public Set<String> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<String> authorities) {
+        this.authorities = authorities;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("username", username)
                 .append("email", email)
                 .append("password", password)
+                .append("authorities", authorities)
                 .toString();
     }
 }

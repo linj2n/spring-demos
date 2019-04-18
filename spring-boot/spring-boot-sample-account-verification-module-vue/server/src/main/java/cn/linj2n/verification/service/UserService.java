@@ -54,7 +54,7 @@ public class UserService {
         newUser.setUsername(username);
         newUser.setEmail(email);
         // new user is not active
-        newUser.setActivated(false);
+        newUser.setActivated(true);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         authority.ifPresent(authorities::add);
@@ -108,5 +108,8 @@ public class UserService {
     }
     public Optional<User> getUserByPasswordResetKey(String key) {
         return userRepository.findOneByResetKey(key).filter(User::isActivated);
+    }
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findOneByUsername(username);
     }
 }

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class MessageResource {
-    @RequestMapping(value = "/v1/user",
+    @RequestMapping(value = "/v1/message",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addAccount() {
+    public ResponseEntity<?> getMessage() {
         return new ResponseEntity<>(ResponseGenerator.buildSuccessResponse("Welcome"), HttpStatus.OK);
     }
 }

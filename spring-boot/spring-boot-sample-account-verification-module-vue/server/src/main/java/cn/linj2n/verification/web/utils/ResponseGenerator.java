@@ -7,7 +7,10 @@ import org.springframework.http.HttpStatus;
 public class ResponseGenerator {
 
     private static final String DEFAULT_SUCCESS_STATUS = "success";
+
     private static final String DEFAULT_FAILED_STATUS = "fail";
+
+    private static final String INTERNAL_SERVER_ERROR = "internal server error";
 
 //    public static ResponseDTO buildHttpResponse(HttpStatus status){
 //        return new ResponseDTO()
@@ -44,6 +47,12 @@ public class ResponseGenerator {
     public static ResponseDTO buildFailedResponse() {
         return new ResponseDTO()
                 .setCode(ResponseCode.FAIL)
+                .setMessage(DEFAULT_FAILED_STATUS);
+    }
+
+    public static ResponseDTO buildFailedResponse(ResponseCode responseCode) {
+        return new ResponseDTO()
+                .setCode(responseCode)
                 .setMessage(DEFAULT_FAILED_STATUS);
     }
 

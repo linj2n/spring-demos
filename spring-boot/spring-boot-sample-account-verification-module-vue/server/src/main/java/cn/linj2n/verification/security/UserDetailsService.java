@@ -32,7 +32,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException, UserNotActivatedException{
-        log.debug("Authenticating {}", login);
+        log.info("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
         Optional<User> userFromDatabase = userRepository.findOneByUsernameOrEmail(lowercaseLogin, lowercaseLogin);
         // Default locale value
@@ -54,6 +54,5 @@ public class UserDetailsService implements org.springframework.security.core.use
                     user.getPassword(),
                     grantedAuthorities);
         }).orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("account.user.notExisted",null,locale)));
-
     }
 }
